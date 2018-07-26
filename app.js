@@ -67,14 +67,23 @@ app.use((req, res, next) => {
   next();
 })
 
+// ===============================
+
+// Load Idea Model to use in index route
+require('./models/Idea');
+const Idea = mongoose.model('ideas');
 
 // Index Route
 app.get('/', (req, res) => {
-  //const title = 'Welcome1';
-  res.render('index', {
-    title: 'Hello World',
-    name: 'Jungdo Lee'
-  });
+  Idea.find()
+  .sort({date: 'desc'})
+  .then(ideas => {
+    res.render('index', {
+      title: 'Vidjot',
+      ideas: ideas
+    })
+  })
+  
 });
 
 // About Route

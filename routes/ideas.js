@@ -19,6 +19,20 @@ router.get('/', ensureAuthenticated, (req, res) => {
   
 });
 
+// Idea Show
+router.get('/:id', (req, res) => {
+  Idea.findOne({
+    _id: req.params.id
+  }).populate('idea')
+    .exec((err, idea) => {
+      if(err) { return next(err); }
+      res.render('ideas/show', {
+        idea: idea
+      });
+    })
+})
+
+
 // Add Idea Form
 router.get('/add', ensureAuthenticated, (req, res) => {
   res.render('ideas/add');
