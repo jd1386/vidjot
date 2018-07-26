@@ -7,31 +7,28 @@ const {ensureAuthenticated} = require('../helpers/auth');
 require('../models/Idea');
 const Idea = mongoose.model('ideas');
 
-// Idea Index
+// Idea Index Page
 router.get('/', ensureAuthenticated, (req, res) => {
   Idea.find({user: req.user.id})
-    .sort({date: 'desc'})
+    .sort({date:'desc'})
     .then(ideas => {
       res.render('ideas/index', {
-        ideas: ideas
+        ideas:ideas
       });
     });
-  
 });
 
-// Idea Show
-router.get('/:id', (req, res) => {
-  Idea.findOne({
-    _id: req.params.id
-  }).populate('idea')
-    .exec((err, idea) => {
-      if(err) { return next(err); }
-      res.render('ideas/show', {
-        idea: idea
-      });
-    })
-})
-
+// // Idea Show Page
+// router.get('/:id', (req, res) => {
+//   Idea.findOne({
+//     _id: req.params.id
+//   })
+//     .then(idea => {
+//       res.render('ideas/show', {
+//         idea: idea
+//       });
+//     });
+// });
 
 // Add Idea Form
 router.get('/add', ensureAuthenticated, (req, res) => {
@@ -44,44 +41,45 @@ router.get('/edit/:id', ensureAuthenticated, (req, res) => {
     _id: req.params.id
   })
   .then(idea => {
-    if(idea.user != req.user.id) {
-      req.flash('error_msg', 'You are not authorized');
+    if(idea.user != req.user.id){
+      req.flash('error_msg', 'Not Authorized');
       res.redirect('/ideas');
     } else {
       res.render('ideas/edit', {
-        idea: idea
+        idea:idea
       });
     }
+    
   });
-  
 });
 
 // Process Form
 router.post('/', ensureAuthenticated, (req, res) => {
   let errors = [];
 
-  if(!req.body.title) {
-    errors.push({text: 'Please add a title'});
+  if(!req.body.title){
+    errors.push({text:'Please add a title'});
   }
-  if(!req.body.details) {
-    errors.push({text: "Please add some details"});
+  if(!req.body.details){
+    errors.push({text:'Please add some details'});
   }
-  if(errors.length > 0) {
-    res.render('ideas/add', {
+
+  if(errors.length > 0){
+    res.render('/add', {
       errors: errors,
       title: req.body.title,
       details: req.body.details
-    })
+    });
   } else {
     const newUser = {
       title: req.body.title,
       details: req.body.details,
       user: req.user.id
-    };
+    }
     new Idea(newUser)
       .save()
       .then(idea => {
-        req.flash('success_msg', `Successfully created ${idea.title}`);
+        req.flash('success_msg', 'Video idea added');
         res.redirect('/ideas');
       })
   }
@@ -99,7 +97,7 @@ router.put('/:id', ensureAuthenticated, (req, res) => {
 
     idea.save()
       .then(idea => {
-        req.flash('success_msg', 'Successfully edited')
+        req.flash('success_msg', 'Video idea updated');
         res.redirect('/ideas');
       })
   });
@@ -109,9 +107,9 @@ router.put('/:id', ensureAuthenticated, (req, res) => {
 router.delete('/:id', ensureAuthenticated, (req, res) => {
   Idea.remove({_id: req.params.id})
     .then(() => {
-      req.flash('success_msg', `Successfully removed ${req.params.id}`);
+      req.flash('success_msg', 'Video idea removed');
       res.redirect('/ideas');
-    })
+    });
 });
 
 module.exports = router;

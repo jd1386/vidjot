@@ -15,10 +15,6 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
-  ideas: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Idea'
-  }],
   date: {
     type: Date,
     default: Date.now
